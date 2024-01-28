@@ -16,5 +16,7 @@ class NodeCode(QMainWindow):
        # Maximize the window
         self.showMaximized()
 
+        
+
 
     

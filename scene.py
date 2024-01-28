@@ -2,6 +2,16 @@ import math
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from PyQt5.uic import loadUi
+
+
+class CustomDialog(QDialog):
+    def __init__(self, parent=None):
+        super(CustomDialog, self).__init__(parent)
+        
+        # Load the UI file into the dialog
+        loadUi(r'ui\nodelist.ui', self)
+
 
 class NodeScene(QGraphicsScene):
     def __init__(self, parent=None):
@@ -22,6 +32,7 @@ class NodeScene(QGraphicsScene):
         self.setSceneRect(-50000 // 2, -50000 // 2, 50000, 50000)
         self.setBackgroundBrush(self._color_background)
 
+        
     def drawBackground(self, painter, rect):
         super().drawBackground(painter, rect)
 
@@ -54,3 +65,5 @@ class NodeScene(QGraphicsScene):
 
         painter.setPen(self._pen_dark)
         painter.drawLines(*lines_dark)
+
+
