@@ -26,9 +26,15 @@
         <verstretch>1</verstretch>
        </sizepolicy>
       </property>
+      <property name="mouseTracking">
+       <bool>true</bool>
+      </property>
+      <property name="acceptDrops">
+       <bool>true</bool>
+      </property>
       <property name="styleSheet">
        <string notr="true">QTabWidget::pane {
-
+	
     background-color: #F2F2F2;
 }
 
@@ -65,7 +71,16 @@ QTabBar::tab:!selected:hover {
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tab">
+      <property name="tabsClosable">
+       <bool>true</bool>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
+      </property>
+      <property name="tabBarAutoHide">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="Main">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>1</horstretch>
@@ -73,11 +88,11 @@ QTabBar::tab:!selected:hover {
         </sizepolicy>
        </property>
        <attribute name="title">
-        <string>Tab 1</string>
+        <string>Main </string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_2"/>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="main">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -85,7 +100,7 @@ QTabBar::tab:!selected:hover {
         </sizepolicy>
        </property>
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>main</string>
        </attribute>
       </widget>
      </widget>
@@ -101,12 +116,6 @@ QTabBar::tab:!selected:hover {
      <height>26</height>
     </rect>
    </property>
-   <widget class="QMenu" name="Menubar">
-    <property name="title">
-     <string>File</string>
-    </property>
-   </widget>
-   <addaction name="Menubar"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

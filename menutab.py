@@ -27,6 +27,8 @@ class MenuBar(QMainWindow):
         for i in range(self.Tabar.count()):
             self.Tabar.removeTab(0)
         self.Tabar.addTab(container_widget, f"New Tab {self.Tabar.count()+1}")
+
+        
         
         
     def graphics_view(self):
