@@ -7,6 +7,7 @@ from contextmenu import RightClickMenu
 
 
 class NodeScene(QGraphicsScene):
+    mouseMoveSignal = pyqtSignal(QGraphicsSceneMouseEvent)
     def __init__(self, parent=None):
         super(NodeScene, self).__init__(parent)
         self.gridSize = 20
@@ -22,11 +23,14 @@ class NodeScene(QGraphicsScene):
         self.setBackgroundBrush(self._color_background)
         self._zoom_factor = 1.0
         self.selectionChanged.connect(self.check_item_selected)
+        self.selectedNode = None
+
+        self.isfollowing = False
 
     def check_item_selected(self):
-        print("selected x")
-        selected_items = self.selectedItems()
-        for item in selected_items:
+        #print("selected x")
+        self.selectedNode = self.selectedItems()
+        for item in self.selectedNode:
             item_name = item.data(0)  # Assuming the name is stored in data role 0
             print(f"Selected item: {item_name}")
 
@@ -71,13 +75,16 @@ class NodeScene(QGraphicsScene):
         print(f"Cursor changed to: {cursor}")
 
     def mousePressEvent(self, event):
+        
         if event.button() == Qt.RightButton:
-            print(f"y={event.screenPos().y()},x={event.screenPos().x()},\nSy={event.scenePos().y()},Sx={event.scenePos().x()}")
+            #print(f"y={event.screenPos().y()},x={event.screenPos().x()},\nSy={event.scenePos().y()},Sx={event.scenePos().x()}")
             self.position = event.scenePos()
             menu = RightClickMenu(self.views()[0], self)
             menu.exec_(event.screenPos())
         
-        
+
+    def mouseMoveEvent(self, event):
+        self.mouseMoveSignal.emit(event)
         
         
     def wheelEvent(self, event):

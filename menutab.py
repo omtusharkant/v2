@@ -14,17 +14,30 @@ class EditorView(QGraphicsView):
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
+        
         self.scene = NodeScene()
         self.setScene(self.scene)
 
         self.last_scene_pos = QPointF()
 
+        self.scene.mouseMoveSignal.connect(self.handleMouseMove)
+        
+
     def mousePressEvent(self, event):
         if event.button() == Qt.MiddleButton:
             self.middleMouseButtonPress(event)
+
+        
         elif event.button() == Qt.LeftButton:
-            print("left")
+            
+            self.item = self.itemAt(event.pos())
+            if self.item:
+                self.item.setSelected(True)
+                self.scene.isfollowing = not self.scene.isfollowing
+                print(f" item pressed!")
+                self.offset = self.item.pos() - self.mapToScene(event.pos())
+                
+
         
         else:
             super().mousePressEvent(event)
@@ -32,10 +45,23 @@ class EditorView(QGraphicsView):
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.MiddleButton:
             self.middleMouseButtonRelease(event)
-        
+
+
+        elif event.button() == Qt.LeftButton:
+            self.scene.isfollowing = False
+            self.item.setSelected(False)
+
+            
         else:
             super().mouseReleaseEvent(event)
 
+    def handleMouseMove(self, event):
+        
+        selecteditem = self.scene.selectedNode
+        if self.scene.isfollowing:
+            #self.offset = self.item.pos() - event.screenPos()
+            
+            selecteditem[0].setPos(event.scenePos() + self.offset)
 
     def middleMouseButtonPress(self, event):
         releaseEvent = QMouseEvent(QEvent.MouseButtonRelease, event.localPos(), event.screenPos(),
