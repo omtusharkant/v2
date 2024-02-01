@@ -1,9 +1,9 @@
 import math
 from PyQt5.QtGui import *
+from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from PyQt5.uic import loadUi
-
+from contextmenu import RightClickMenu
 
 
 class NodeScene(QGraphicsScene):
@@ -20,9 +20,16 @@ class NodeScene(QGraphicsScene):
         self._pen_dark.setWidth(2)
         self.setSceneRect(-50000 // 2, -50000 // 2, 50000, 50000)
         self.setBackgroundBrush(self._color_background)
+        self._zoom_factor = 1.0
+        self.selectionChanged.connect(self.check_item_selected)
 
+    def check_item_selected(self):
+        print("selected x")
+        selected_items = self.selectedItems()
+        for item in selected_items:
+            item_name = item.data(0)  # Assuming the name is stored in data role 0
+            print(f"Selected item: {item_name}")
 
-        
     def drawBackground(self, painter, rect):
         super().drawBackground(painter, rect)
         left = int(math.floor(rect.left()))
@@ -50,8 +57,7 @@ class NodeScene(QGraphicsScene):
 
         painter.setPen(self._pen_dark)
         painter.drawLines(lines_dark)
-    
-    
+
     @property
     def position(self):
         return self._position
@@ -59,71 +65,35 @@ class NodeScene(QGraphicsScene):
     @position.setter
     def position(self, new_position):
         self._position = new_position
-    
-    
+
+    def cursorChangeHandler(self):
+        cursor = self.views()[0].viewport().cursor()
+        print(f"Cursor changed to: {cursor}")
+
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
             print(f"y={event.screenPos().y()},x={event.screenPos().x()},\nSy={event.scenePos().y()},Sx={event.scenePos().x()}")
             self.position = event.scenePos()
-            menu = RightClickMenu(self.views()[0],self)
+            menu = RightClickMenu(self.views()[0], self)
             menu.exec_(event.screenPos())
-            
         
+        
+        
+        
+    def wheelEvent(self, event):
+        # Zoom in or out based on the mouse wheel delta
+        zoom_in_factor = 1.2
+        zoom_out_factor = 1.0 / zoom_in_factor
+
+        if event.delta() > 0:
+            # Zoom in
+            self._zoom_factor *= zoom_in_factor
+        else:
+            # Zoom out
+            self._zoom_factor *= zoom_out_factor
+
+        # Apply a scale transformation to the view
+        self.views()[0].setTransform(QTransform().scale(self._zoom_factor, self._zoom_factor))
+
     
-class RightClickMenu(QMenu):
-    def __init__(self,scene,node_scene, parent=None):
-        super(RightClickMenu, self).__init__("Right-Click Menu", parent)
-        self.scene = scene
-        self.node_scene = node_scene
-
-        self.search_box = QLineEdit(self)
-        self.search_box.setPlaceholderText("Enter text...")
-        self.search_box.setContextMenuPolicy(Qt.NoContextMenu)  # Disable default context menu
-        search_action = QWidgetAction(self)
-        search_action.setDefaultWidget(self.search_box)
-        self.addAction(search_action)
-        self.dropdown = QComboBox(self)
-        self.dropdown.addItem("Option 1")
-        self.dropdown.addItem("Option 2")
-        self.dropdown.addItem("Option 3")
-
-        self.addAction("Print Location")
-        self.addAction("Custom Action 1")
-        self.addAction("Custom Action 2")
-        self.addSeparator()
-        
-        add_node_action = QAction("Add Node", self)
-        self.addAction(add_node_action)
-        add_node_action.triggered.connect(self.addNode)
-
-        dropdown_action = QWidgetAction(self)
-        dropdown_action.setDefaultWidget(self.dropdown)
-        self.addAction(dropdown_action)
-
-        self.addAction("Exit")
-
-        self.search_box.textChanged.connect(self.filterActions)
-        self.dropdown.currentIndexChanged.connect(self.handleDropdown)
-    def addNode(self):
-         # Change the cursor to move or drag
-        self.setCursor(Qt.ClosedHandCursor)
-        print(self.node_scene.position)
-        # Retrieve the scene position from the last right-click event
-        
-        specific_position = self.node_scene.position
-
-        rect_item = QGraphicsRectItem(specific_position.x(), specific_position.y(), 50, 50)  # Adjust the size as needed
-        rect_item.setBrush(Qt.red)  # Set the brush color
-        rect_item.setFlag(QGraphicsItem.ItemIsMovable)
-        rect_item.setFlag(QGraphicsItem.ItemIsSelectable)
-
-        self.node_scene.addItem(rect_item)
-            
-
-    def filterActions(self, text):
-        for action in self.actions():
-            action.setVisible(text.lower() in action.text().lower() or not text)
-
-    def handleDropdown(self, index):
-        print(f"Selected option: {self.dropdown.itemText(index)}")
-
+    
