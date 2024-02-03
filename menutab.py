@@ -21,6 +21,7 @@ class EditorView(QGraphicsView):
         self.last_scene_pos = QPointF()
 
         self.scene.mouseMoveSignal.connect(self.handleMouseMove)
+        self.item = None
         
 
     def mousePressEvent(self, event):
@@ -34,7 +35,7 @@ class EditorView(QGraphicsView):
             if self.item:
                 self.item.setSelected(True)
                 self.scene.isfollowing = not self.scene.isfollowing
-                print(f" item pressed!")
+                
                 self.offset = self.item.pos() - self.mapToScene(event.pos())
                 
 
@@ -49,8 +50,9 @@ class EditorView(QGraphicsView):
 
         elif event.button() == Qt.LeftButton:
             self.scene.isfollowing = False
-            self.item.setSelected(False)
-
+            if self.item:
+                self.item.setSelected(False)
+            self.setCursor(Qt.ArrowCursor)
             
         else:
             super().mouseReleaseEvent(event)
@@ -59,9 +61,9 @@ class EditorView(QGraphicsView):
         
         selecteditem = self.scene.selectedNode
         if self.scene.isfollowing:
-            #self.offset = self.item.pos() - event.screenPos()
-            
-            selecteditem[0].setPos(event.scenePos() + self.offset)
+            self.setCursor(Qt.ClosedHandCursor)
+            if selecteditem:
+                selecteditem[0].setPos(event.scenePos() + self.offset)
 
     def middleMouseButtonPress(self, event):
         releaseEvent = QMouseEvent(QEvent.MouseButtonRelease, event.localPos(), event.screenPos(),
@@ -126,7 +128,7 @@ class MenuBar(QMainWindow):
         
 
         # Add the EditorView as the widget for the new tab
-        new_tab_index = self.tab_widget.addTab(self.editor_view, "New Tab")
+        new_tab_index = self.tab_widget.addTab(self.editor_view, f"New Tab {self.Tabar.count() + 1}")
 
         # You can set the current tab to the new one if you want
         self.tab_widget.setCurrentIndex(new_tab_index)

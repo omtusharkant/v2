@@ -24,7 +24,7 @@ class NodeScene(QGraphicsScene):
         self._zoom_factor = 1.0
         self.selectionChanged.connect(self.check_item_selected)
         self.selectedNode = None
-
+        self.setStickyFocus(True)
         self.isfollowing = False
 
     def check_item_selected(self):

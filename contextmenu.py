@@ -1,6 +1,7 @@
 import inspect
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 import time
 from random import randint
 
@@ -32,7 +33,7 @@ class RightClickMenu(QMenu):
         PRINTND.triggered.connect(lambda: self.addNode(PRINTND))
         
         GetND=add_node_action.addAction("get")
-        GetND.triggered.connect(lambda: self.addNode(PRINTND))
+        GetND.triggered.connect(lambda: self.addNode(GetND))
         
         self.addMenu(add_node_action)
         
@@ -61,10 +62,7 @@ class RightClickMenu(QMenu):
         
         all_classes = inspect.getmembers(__import__(__name__), inspect.isclass)
 
-        for i in all_classes:
-            print(i,)
-        else:
-                pass
+        print(menu_action.text())
         
         specific_position = self.node_scene.position
         
@@ -88,29 +86,46 @@ class RightClickMenu(QMenu):
 
 
 
-class PRINTND(QGraphicsTextItem):
+class PRINTND(QGraphicsItem):
     def __init__(self, text, specific_position, scene):
-        super(PRINTND, self).__init__(text)
+        super(PRINTND, self).__init__()
         self.scene = scene
+        self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsMovable)
         self.setAcceptHoverEvents(True)
         self.specific_position = specific_position
-        self.printNodeInfo()
+        self.rect_width = 250
+        self.rect_height =400
 
-    def printNodeInfo(self):
-        print(f"Node Text: {self.toPlainText()}")
-        print(f"Node Position: {self.scenePos()}")
-        self.setCursor(Qt.ClosedHandCursor)
+        # Set some example data
+        self.setData(0, "Print node")
+        self.setData(1, "AdditionalInfo")
 
-        PrintBg = QGraphicsRectItem(self.specific_position.x(), self.specific_position.y(), 350, 450)
-        PrintBg.setBrush(Qt.red)
-        PrintBg.setFlag(QGraphicsItem.ItemIsMovable)
-        PrintBg.setFlag(QGraphicsItem.ItemIsSelectable)
-        PrintBg.setData(0, randint(0, 10))
-        self.scene.addItem(PrintBg)
 
     def boundingRect(self):
-        return self.childrenBoundingRect()
+        return QRectF(self.specific_position.x(), self.specific_position.y(), self.rect_width, self.rect_height)
 
     def paint(self, painter, option, widget):
-        pass 
-    
+        ndbg = QRectF(self.specific_position.x(), self.specific_position.y(), self.rect_width, self.rect_height)
+        painter.setBrush(QBrush(Qt.red))
+        painter.drawRect(ndbg)
+
+        
+        titlebg = QRectF(self.specific_position.x() , self.specific_position.y(), self.rect_width,50)
+        painter.setBrush(QBrush(Qt.blue))
+        painter.drawRect(titlebg)
+
+
+        font = QFont("winter storm", 16, QFont.Bold)  # Node title
+        painter.setFont(font)
+
+        title_text = "Print"  # Change this to your actual title text
+        text_rect = QRectF(self.specific_position.x()+15, self.specific_position.y(), self.rect_width, 50)
+        painter.setPen(Qt.white)  # Set text color
+        painter.drawText(text_rect, title_text)
+
+        font = QFont("lemon milk", 8, )  # description 
+        painter.setFont(font)
+        description_text = "prints in the console"  # Change this to your actual title text
+        dest_rect = QRectF(self.specific_position.x()+15, self.specific_position.y()+25, self.rect_width, 50)
+        painter.setPen(Qt.white)  # Set text color
+        painter.drawText(dest_rect, description_text)
